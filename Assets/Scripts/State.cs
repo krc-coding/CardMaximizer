@@ -1,7 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class state : MonoBehaviour
+public class State : MonoBehaviour
 {
+    // Blank cards replace joker card.
+    public int drawPileCount = 56;
+    public Sprite[] cardSprites;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
