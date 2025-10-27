@@ -1,18 +1,20 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerHandHandler : MonoBehaviour
 {
     public State state;
-    
-    [Header("Card Display Settings")]
-    [SerializeField] private float cardSpacing = 1.5f;
+    public bool shouldShowCards = true;
+    public Sprite cardBack;
+
+    [Header("Card Display Settings")] [SerializeField]
+    private float cardSpacing = 1.5f;
+
     [SerializeField] private float cardXScale = 1f;
     [SerializeField] private float cardYScale = 1f;
-    
+
     private List<GameObject> instantiatedCards = new List<GameObject>();
-    
+
     void Start()
     {
         // Clear any existing children
@@ -30,60 +32,64 @@ public class PlayerHandHandler : MonoBehaviour
             UpdateHand();
         }
     }
-    
+
     private bool HasHandChanged()
     {
         // Check if number of cards has changed
         if (instantiatedCards.Count != state.playerCards.Count)
             return true;
-        
+
+        if (shouldShowCards == false)
+            return false;
+
         // Check if any card is different
         for (int i = 0; i < state.playerCards.Count; i++)
         {
-            if (i >= instantiatedCards.Count || 
-                instantiatedCards[i] == null || 
+            if (i >= instantiatedCards.Count ||
+                instantiatedCards[i] == null ||
                 instantiatedCards[i].GetComponent<SpriteRenderer>().sprite != state.playerCards[i])
             {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     private void UpdateHand()
     {
         // Clear existing cards
         ClearHand();
-        
+
         // Create new card GameObjects for each sprite in the hand
         for (int i = 0; i < state.playerCards.Count; i++)
         {
-            CreateCard(state.playerCards[i], i);
+            if (shouldShowCards) CreateCard(state.playerCards[i], i);
+            else CreateCard(cardBack, i);
         }
     }
-    
+
     private void CreateCard(Sprite cardSprite, int index)
     {
         // Create a new GameObject for the card
         GameObject cardObject = new GameObject($"Card_{index}");
         cardObject.transform.SetParent(transform);
-        
+
         // Add and configure SpriteRenderer
         SpriteRenderer spriteRenderer = cardObject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = cardSprite;
-        
+
         // Position the card
         float xPosition = (index - (state.playerCards.Count - 1) / 2f) * cardSpacing;
         cardObject.transform.localPosition = new Vector3(xPosition, -0.075f, 0);
         //cardObject.transform.localScale = Vector3.one * 1;
         cardObject.transform.localScale = new Vector3(cardXScale, cardYScale);
-        
-        
+
+
         // Store reference
         instantiatedCards.Add(cardObject);
     }
-    
+
     private void ClearHand()
     {
         // Destroy all existing card GameObjects
@@ -94,9 +100,10 @@ public class PlayerHandHandler : MonoBehaviour
                 Destroy(card);
             }
         }
+
         instantiatedCards.Clear();
     }
-    
+
     /// <summary>
     /// Remove a card from the state by index. Call this when a card is played.
     /// </summary>
@@ -108,7 +115,7 @@ public class PlayerHandHandler : MonoBehaviour
             // Hand will auto-update in next Update() call
         }
     }
-    
+
     /// <summary>
     /// Remove a specific card from the state. Call this when a card is played.
     /// </summary>
@@ -120,7 +127,7 @@ public class PlayerHandHandler : MonoBehaviour
             // Hand will auto-update in next Update() call
         }
     }
-    
+
     /// <summary>
     /// Add a card to the state. Call this when drawing a card.
     /// </summary>
