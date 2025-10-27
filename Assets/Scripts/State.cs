@@ -5,17 +5,11 @@ public class State : MonoBehaviour
 {
     // Blank cards replace joker card.
     public int drawPileCount = 56;
-    public Sprite[] cardSprites;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public Sprite[] pileSprites;
+    public Sprite[] clubs;
+    public Sprite[] hearts;
+    public Sprite[] spades;
+    public Sprite[] diamonds;
+    public List<Sprite> playerCards;
+    public int maxHandSize = 5;
 }
