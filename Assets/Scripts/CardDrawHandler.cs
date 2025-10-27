@@ -63,7 +63,6 @@ public class CardDrawHandler : MonoBehaviour, IPointerClickHandler
         try
         {
             Sprite card = _allCards[cardIndex];
-            state.playerCards.Add(card);
             _allCards.RemoveAt(cardIndex);
             return card;
         }
