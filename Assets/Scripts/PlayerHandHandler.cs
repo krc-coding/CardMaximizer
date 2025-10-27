@@ -85,6 +85,13 @@ public class PlayerHandHandler : MonoBehaviour
         //cardObject.transform.localScale = Vector3.one * 1;
         cardObject.transform.localScale = new Vector3(cardXScale, cardYScale);
 
+        if (shouldShowCards)
+        {
+            spriteRenderer.sortingOrder = 10;
+            cardObject.AddComponent<BoxCollider2D>().isTrigger = true;
+            cardObject.AddComponent<CardDragAndDrop>();
+        }
+
 
         // Store reference
         instantiatedCards.Add(cardObject);
