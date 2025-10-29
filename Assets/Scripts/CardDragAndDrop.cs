@@ -1,45 +1,33 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
-public class CardDragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
+public class CardDragAndDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
-    private bool _isDragging = false;
-    private Vector3 _offset;
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        Debug.Log("Click");
-    }
-
+    private Vector3 _startPosition;
+    
     public void OnDrag(PointerEventData eventData)
     {
-        Debug.Log("Drag");
-        transform.position += new Vector3(eventData.delta.x, eventData.delta.y, 0) * Time.deltaTime;
+        Vector3 mousePos = Mouse.current.position.ReadValue();
+        mousePos.z = 10;
+        
+        // Convert screen position to world position
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
+        worldPosition.z = 0;
+        transform.position = worldPosition;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log("Drag start");
+        _startPosition = transform.position;
+        GetComponent<BoxCollider2D>().enabled = false;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.Log("Drag end");
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (_isDragging)
-        {
-            transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + _offset;
-        }
+        transform.position = _startPosition;
+        GetComponent<BoxCollider2D>().enabled = true;
     }
 }
