@@ -6,6 +6,7 @@ public class PlayerHandHandler : MonoBehaviour
     public State state;
     public bool shouldShowCards = true;
     public Sprite cardBack;
+    public GameObject cardPrefab;
 
     [Header("Card Display Settings")] [SerializeField]
     private float cardSpacing = 1.5f;
@@ -72,26 +73,23 @@ public class PlayerHandHandler : MonoBehaviour
     private void CreateCard(Sprite cardSprite, int index)
     {
         // Create a new GameObject for the card
-        GameObject cardObject = new GameObject($"Card_{index}");
-        cardObject.transform.SetParent(transform);
+        GameObject cardObject = Instantiate(cardPrefab, transform);
+        cardObject.name = "Card " + index;
 
-        // Add and configure SpriteRenderer
-        SpriteRenderer spriteRenderer = cardObject.AddComponent<SpriteRenderer>();
-        spriteRenderer.sprite = cardSprite;
+        // Configure SpriteRenderer
+        if (shouldShowCards)
+        {
+            cardObject.GetComponent<SpriteRenderer>().sprite = cardSprite;
+        }
+        else
+        {
+            cardObject.GetComponent<SpriteRenderer>().sprite = cardBack;
+        }
 
         // Position the card
         float xPosition = (index - (state.playerCards.Count - 1) / 2f) * cardSpacing;
         cardObject.transform.localPosition = new Vector3(xPosition, -0.075f, 0);
-        //cardObject.transform.localScale = Vector3.one * 1;
         cardObject.transform.localScale = new Vector3(cardXScale, cardYScale);
-
-        if (shouldShowCards)
-        {
-            spriteRenderer.sortingOrder = 10;
-            cardObject.AddComponent<BoxCollider2D>().isTrigger = true;
-            cardObject.AddComponent<CardDragAndDrop>();
-        }
-
 
         // Store reference
         instantiatedCards.Add(cardObject);
