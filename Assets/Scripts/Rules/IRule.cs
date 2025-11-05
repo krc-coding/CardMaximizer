@@ -37,6 +37,7 @@ namespace Rules
     /// </summary>
     public interface ISetupRule : IRule
     {
+        string[] rulesList { get; }
         /// <summary>
         /// Description of what this game mode is about
         /// </summary>

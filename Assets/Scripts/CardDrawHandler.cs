@@ -7,10 +7,13 @@ using Random = UnityEngine.Random;
 public class CardDrawHandler : MonoBehaviour, IPointerClickHandler
 {
     public State state;
-    private readonly List<Sprite> _allCards =  new List<Sprite>();
+    private readonly List<Sprite> _allCards = new List<Sprite>();
+    private GameManager gameManager;
 
     public void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
+
         // Jokers (blank cards)
         _allCards.Add(state.clubs[0]);
         _allCards.Add(state.hearts[0]);
@@ -44,33 +47,50 @@ public class CardDrawHandler : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (_allCards.Count == 0) return;
-        if (state.playerCards.Count >= state.maxHandSize) return;
+        if (!gameManager.CanPlayCard()) return;
+        if (GetRemainingCards() == 0)
+        {
+            Debug.Log("Deck is empty!");
+            return;
+        }
+
+        if (state.playerCards.Count >= state.maxHandSize)
+        {
+            Debug.Log("Hand is full!");
+            return;
+        }
         
-        Sprite card = DrawCard();
-        state.playerCards.Add(card);
+        DrawCard(true);
     }
 
-    public void TriggerCardDraw()
+    public void DrawCard(bool forPlayer = true)
     {
-         
+        List<Sprite> targetHand = forPlayer ? state.playerCards : state.opponentCards;
+
+        if (targetHand.Count >= state.maxHandSize)
+        {
+            Debug.Log($"{(forPlayer ? "Player" : "AI")} hand is full!");
+            return;
+        }
+
+        if (GetRemainingCards() == 0)
+        {
+            Debug.Log("Deck is empty!");
+            return;
+        }
+
+        // Draw random card from deck
+        int randomIndex = Random.Range(0, _allCards.Count);
+        Sprite drawnCard = _allCards[randomIndex];
+        _allCards.RemoveAt(randomIndex);
+        targetHand.Add(drawnCard);
+        state.actionsThisTurn++;
+
+        Debug.Log($"{(forPlayer ? "Player" : "AI")} drew: {drawnCard.name}");
     }
 
-    private Sprite DrawCard()
+    public int GetRemainingCards()
     {
-        int cardIndex = Random.Range(0, _allCards.Count);
-        
-        try
-        {
-            Sprite card = _allCards[cardIndex];
-            _allCards.RemoveAt(cardIndex);
-            return card;
-        }
-        catch (ArgumentOutOfRangeException e)
-        {
-            Debug.Log(e.Message);
-            Debug.Log(cardIndex);
-        }
-        return null;
+        return _allCards.Count;
     }
 }

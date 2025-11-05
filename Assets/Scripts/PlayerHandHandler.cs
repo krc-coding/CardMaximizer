@@ -14,6 +14,11 @@ public class PlayerHandHandler : MonoBehaviour
     [SerializeField] private float cardXScale = 1f;
     [SerializeField] private float cardYScale = 1f;
 
+    [Header("Layering Settings")]
+    [SerializeField] private int maxCardsBeforeLayering = 5;
+    [SerializeField] private float minCardSpacing = 0.3f; // Minimum spacing when heavily layered
+    [SerializeField] private float spacingCompressionDivisor = 10f;
+    
     private List<GameObject> instantiatedCards = new List<GameObject>();
 
     void Start()
@@ -87,9 +92,24 @@ public class PlayerHandHandler : MonoBehaviour
         }
 
         // Position the card
-        float xPosition = (index - (state.playerCards.Count - 1) / 2f) * cardSpacing;
+        //float xPosition = (index - (state.playerCards.Count - 1) / 2f) * cardSpacing;
+        //cardObject.transform.localPosition = new Vector3(xPosition, -0.075f, 0);
+        //cardObject.transform.localScale = new Vector3(cardXScale, cardYScale);
+        
+        // Calculate dynamic spacing based on number of cards
+        float dynamicSpacing = CalculateCardSpacing(state.playerCards.Count);
+        Debug.Log("Dynamic spacing: " + dynamicSpacing);
+        // Position the card
+        float xPosition = (index - (state.playerCards.Count - 1) / 2f) * dynamicSpacing;
         cardObject.transform.localPosition = new Vector3(xPosition, -0.075f, 0);
         cardObject.transform.localScale = new Vector3(cardXScale, cardYScale);
+
+        // Set sorting order so cards layer correctly (left to right)
+        SpriteRenderer spriteRenderer = cardObject.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.sortingOrder = index;
+        }
 
         // Store reference
         instantiatedCards.Add(cardObject);
@@ -107,6 +127,26 @@ public class PlayerHandHandler : MonoBehaviour
         }
 
         instantiatedCards.Clear();
+    }
+    
+    private float CalculateCardSpacing(int cardCount)
+    {
+        // If 5 or fewer cards, use normal spacing
+        if (cardCount <= maxCardsBeforeLayering)
+        {
+            return cardSpacing;
+        }
+
+        // Gradually reduce spacing as cards increase beyond 5
+        // This creates a smooth transition to layered cards
+        float excessCards = cardCount - maxCardsBeforeLayering;
+        
+        // Calculate interpolation factor (0 to 1)
+        // Adjust the divisor to control how quickly cards compress
+        float compressionFactor = Mathf.Clamp01(excessCards / spacingCompressionDivisor);
+        
+        // Lerp between normal spacing and minimum spacing
+        return Mathf.Lerp(cardSpacing, minCardSpacing, compressionFactor);
     }
 
     /// <summary>

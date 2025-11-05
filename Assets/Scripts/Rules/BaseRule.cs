@@ -41,6 +41,8 @@ namespace Rules
     /// </summary>
     public abstract class BaseSetupRule : BaseRule, ISetupRule
     {
+        public abstract string[] rulesList { get; }
+        
         public abstract string Description { get; }
 
         public abstract void SetupGame();

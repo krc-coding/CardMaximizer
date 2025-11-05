@@ -7,6 +7,17 @@ namespace Rules
     /// </summary>
     public class BattleModeSetup : BaseSetupRule
     {
+        public override string[] rulesList => new string[]
+        {
+            "Cards deal 1 damage", 
+            "Picture cards deal 2 damage", 
+            "Aces heal 2 life", 
+            "Blank cards reflect damage back",
+            "4 starting cards", 
+            "Start with 20 life", 
+            "1 card per turn"
+        };
+
         public override string RuleName => "Battle Mode";
 
         public override string Description =>
@@ -17,7 +28,7 @@ namespace Rules
 
         public override void SetupGame()
         {
-            gameState = Object.FindObjectOfType<State>();
+            gameState = Object.FindFirstObjectByType<State>();
             if (gameState == null)
             {
                 Debug.LogError("State not found in scene!");
@@ -30,7 +41,7 @@ namespace Rules
             gameState.startingHandSize = 4;
             gameState.playerLife = 20;
             gameState.opponentLife = 20;
-            gameState.maxCardsPlayablePerTurn = 1;
+            gameState.maxActionsPerTurn = 1;
             gameState.winConditionType = State.WinConditionType.LastManStanding;
 
             // Reset points (not used in battle mode)

@@ -8,6 +8,16 @@ namespace Rules
     /// </summary>
     public class PointRaceModeSetup : BaseSetupRule
     {
+        public override string[] rulesList => new string[]
+        {
+            "Race to 50 points",
+            "Cards gives 2 points", 
+            "Picture cards multiply your score",
+            "Blank cards does nothing",
+            "you can play up to 3 cards per turn",
+            "You start with 1 card"
+        };
+
         public override string RuleName => "Point Race";
 
         public override string Description =>
@@ -29,7 +39,7 @@ namespace Rules
 
             // Configure game state for point race mode
             gameState.startingHandSize = 0; // Start with 0 cards
-            gameState.maxCardsPlayablePerTurn = 3;
+            gameState.maxActionsPerTurn = 3;
             gameState.winConditionType = State.WinConditionType.FirstToPoints;
             gameState.pointsToWin = 50;
 
@@ -65,7 +75,7 @@ namespace Rules
             {
                 if (IsPictureCard(card))
                 {
-                    pictureCardMultiplier++;
+                    pictureCardMultiplier *= 2;
                 }
             }
 
